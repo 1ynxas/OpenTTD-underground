@@ -223,6 +223,8 @@ add_files(
     gui.h
     heightmap.cpp
     heightmap.h
+    heightslicer.h
+    heightslicer.cpp
     help_gui.cpp
     help_gui.h
     highscore.cpp

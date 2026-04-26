@@ -2736,6 +2736,67 @@ static bool ConNewGRFProfile(std::span<std::string_view> argv)
 	return false;
 }
 
+/*****************************
+ *  height slicer development commands
+ ******************************/
+extern void ConPrintSlicerSettings(); // heightslicer.cpp
+extern void SetSlicerHeight(uint new_height); // heightslicer.cpp
+extern void SetSlicer(bool enable_flag); // heightslicer.cpp
+
+/** Show the current height slicer settings. @copydoc IConsoleCmdProc */
+static bool ConSlicerSettings(std::span<std::string_view> argv)
+{
+	if (argv.empty()) {
+		IConsolePrint(CC_HELP, "Show height slicer settings.");
+		return true;
+	}
+
+	ConPrintSlicerSettings();
+	return true;
+}
+
+/** Set the slicer height. @copydoc IConsoleCmdProc */
+static bool ConSlicerHeight(std::span<std::string_view> argv)
+{
+	if (argv.empty()) {
+		IConsolePrint(CC_HELP, "Show height slicer settings.");
+		return true;
+	}
+
+	auto new_height = ParseInteger<uint>(argv[1]);
+
+	if (!new_height.has_value()) {
+		IConsolePrint(CC_ERROR, "The slice height must be a valid number.");
+		return true;
+	}
+
+	SetSlicerHeight(*new_height);
+	return true;
+}
+
+/** Toggle slicer. @copydoc IConsoleCmdProc */
+static bool ConSlicer(std::span<std::string_view> argv)
+{
+	if (argv.empty()) {
+		IConsolePrint(CC_HELP, "Set slicer on or off.");
+		return true;
+	}
+
+	if (StrEqualsIgnoreCase(argv[1], "on")) {
+		SetSlicer(true);
+		return true;
+	}
+
+	if (StrEqualsIgnoreCase(argv[1], "off")) {
+		SetSlicer(false);
+		return true;
+	}
+
+	IConsolePrint(CC_ERROR, "Toggle slicer using 'on' or 'off' command.");
+	return true;
+}
+
+
 #ifdef _DEBUG
 /******************
  *  debug commands
@@ -3101,4 +3162,9 @@ void IConsoleStdLibRegister()
 	IConsole::CmdRegister("newgrf_profile",          ConNewGRFProfile,    ConHookNewGRFDeveloperTool);
 
 	IConsole::CmdRegister("dump_info",               ConDumpInfo);
+
+	/* Height slicer stuff */
+	IConsole::CmdRegister("slicer_show",             ConSlicerSettings);
+	IConsole::CmdRegister("slicer_height",           ConSlicerHeight);
+	IConsole::CmdRegister("slicer",                  ConSlicer);
 }

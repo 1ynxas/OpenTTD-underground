@@ -53,6 +53,8 @@
 #include "aircraft.h"
 #include "aircraft_cmd.h"
 
+#include "heightslicer.h"
+
 #include "table/strings.h"
 #include "table/settings.h"
 
