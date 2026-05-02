@@ -91,6 +91,8 @@
 #include "framerate_type.h"
 #include "viewport_cmd.h"
 
+#include "heightslicer.h"
+
 #include <forward_list>
 #include <stack>
 
@@ -1257,6 +1259,11 @@ static void ViewportAddLandscape()
 				tile_type = GetTileType(_cur_ti.tile);
 			} else {
 				_cur_ti.tile = INVALID_TILE;
+				tile_type = TileType::Void;
+			}
+
+			/* paint it black if it's sliced away*/
+			if (tile_type != TileType::Void && IsSlicedAway(_cur_ti.tile)) {
 				tile_type = TileType::Void;
 			}
 

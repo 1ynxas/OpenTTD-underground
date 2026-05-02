@@ -7,6 +7,11 @@
 
  /** @file heightslicer.cpp For viewing underground stuff. */
 
+/*  TODO:
+ *  Redraw once slicer is turned on, check console close action
+ */
+
+
 #include "stdafx.h"
 #include "console_func.h"
 

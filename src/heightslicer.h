@@ -9,3 +9,27 @@
 
 extern uint _slice_height;
 extern bool _view_slice;
+
+/**
+ * ...
+ * ..
+ *
+ * @param ti the info of the tile
+ * @return \c true if the tile should not be drawn
+ */
+inline bool IsSlicedAway(const TileInfo *ti)
+{	
+    return (_view_slice && (GetTileZ(ti->tile) >= _slice_height));
+}
+
+/**
+ * ...
+ * ..
+ *
+ * @param ti the info of the tile
+ * @return \c true if the tile should not be drawn
+ */
+inline bool IsSlicedAway(TileIndex tile)
+{	
+    return (_view_slice && (GetTileZ(tile) >= _slice_height));
+}
