@@ -8,11 +8,12 @@
  /** @file heightslicer.cpp For viewing underground stuff. */
 
 /*  TODO:
- *  Redraw once slicer is turned on, check console close action
+ *  
  */
 
 
 #include "stdafx.h"
+#include "gfx_func.h"
 #include "console_func.h"
 
 uint _slice_height;
@@ -32,4 +33,5 @@ void SetSlicerHeight(uint new_height)
 void SetSlicer(bool enable_flag)
 {
     _view_slice = enable_flag;
+    MarkWholeScreenDirty();
 }
