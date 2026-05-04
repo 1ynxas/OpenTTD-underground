@@ -14,6 +14,7 @@
 #include "tile_type.h"
 #include "map_type.h"
 #include "direction_func.h"
+#include <unordered_map>
 
 /**
  * Wrapper class to abstract away the way the tiles are stored. It is
@@ -51,8 +52,14 @@ private:
 		uint16_t m8 = 0; ///< General purpose
 	};
 
+	using UGTilesMap = std::unordered_map<uint8_t, TileBase>; ///< Hashmap for potential underground tiles.
+	using UGTilesExtendedMap = std::unordered_map<uint8_t, TileExtended>; ///< Hashmap for potential underground tiles, extended data.
+
 	static std::unique_ptr<TileBase[]> base_tiles; ///< Pointer to the tile-array.
 	static std::unique_ptr<TileExtended[]> extended_tiles; ///< Pointer to the extended tile-array.
+
+	static std::unique_ptr<UGTilesMap[]> ug_extended_tiles; ///< Pointer to the underground tile hashmap array.
+	static std::unique_ptr<UGTilesExtendedMap[]> ug_base_tiles; ///< Pointer to the extended tile-array.
 
 	TileIndex tile; ///< The tile to access the map data for.
 
