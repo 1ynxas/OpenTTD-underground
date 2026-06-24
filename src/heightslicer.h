@@ -7,8 +7,15 @@
 
  /** @file heightslicer.h Functions related to viewing underground stuff. */
 
+#ifndef HEIGHTSLICER_H
+#define HEIGHTSLICER_H
+
 extern uint _slice_height;
 extern bool _view_slice;
+
+void SetSlicerHeight(uint new_height);
+void SetSlicer(bool enable_flag);
+void ConPrintSlicerSettings();
 
 /**
  * ...
@@ -33,3 +40,5 @@ inline bool IsSlicedAway(TileIndex tile)
 {	
     return (_view_slice && (GetTileZ(tile) >= _slice_height));
 }
+
+#endif /* HEIGHTSLICER_H */

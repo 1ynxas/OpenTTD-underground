@@ -22,6 +22,11 @@ enum TerraformToolbarWidgets : WidgetID {
 	WID_TT_PLANT_TREES,                       ///< Plant trees button (note: opens separate window, no place-push-button).
 	WID_TT_PLACE_SIGN,                        ///< Place sign button.
 	WID_TT_PLACE_OBJECT,                      ///< Place object button.
+	WID_TT_BUTTONS_END,                       ///< End of pushable buttons.
+	WID_TT_SLICER_TOGGLE = WID_TT_BUTTONS_END, ///< Toggle height slicer on/off.
+	WID_TT_SLICER_HEIGHT_DOWN,                ///< Decrease slicer height.
+	WID_TT_SLICER_HEIGHT_TEXT,                ///< Display/edit current slicer height.
+	WID_TT_SLICER_HEIGHT_UP,                  ///< Increase slicer height.
 };
 
 /** Widgets of the #ScenarioEditorLandscapeGenerationWindow class. */

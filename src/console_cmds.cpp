@@ -2739,9 +2739,7 @@ static bool ConNewGRFProfile(std::span<std::string_view> argv)
 /*****************************
  *  height slicer development commands
  ******************************/
-extern void ConPrintSlicerSettings(); // heightslicer.cpp
-extern void SetSlicerHeight(uint new_height); // heightslicer.cpp
-extern void SetSlicer(bool enable_flag); // heightslicer.cpp
+#include "heightslicer.h"
 
 /** Show the current height slicer settings. @copydoc IConsoleCmdProc */
 static bool ConSlicerSettings(std::span<std::string_view> argv)

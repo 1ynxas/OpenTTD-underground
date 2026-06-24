@@ -3063,6 +3063,16 @@ STR_LANDSCAPING_TOOLTIP_RAISE_A_CORNER_OF_LAND                  :{BLACK}Raise a 
 STR_LANDSCAPING_LEVEL_LAND_TOOLTIP                              :{BLACK}Level an area of land to the height of the first selected corner. Ctrl+Click+Drag to select the area diagonally. Also press Shift to show cost estimate only
 STR_LANDSCAPING_TOOLTIP_PURCHASE_LAND                           :{BLACK}Purchase land for future use. Ctrl+Click+Drag to select the area diagonally. Also press Shift to show cost estimate only
 
+# Height slicer
+STR_LANDSCAPING_SLICER_TOGGLE                                   :{BLACK}Slice
+STR_LANDSCAPING_SLICER_TOGGLE_TOOLTIP                           :{BLACK}Toggle the height slicer to hide terrain at or above the set height
+STR_LANDSCAPING_SLICER_ON                                       :{BLACK}ON
+STR_LANDSCAPING_SLICER_OFF                                      :{BLACK}OFF
+STR_LANDSCAPING_SLICER_HEIGHT_DOWN_TOOLTIP                      :{BLACK}Decrease slicer height
+STR_LANDSCAPING_SLICER_HEIGHT_UP_TOOLTIP                        :{BLACK}Increase slicer height
+STR_LANDSCAPING_SLICER_HEIGHT_TOOLTIP                           :{BLACK}Height at or above which terrain is hidden. Click to type a value
+STR_LANDSCAPING_SLICER_HEIGHT_QUERY                             :{WHITE}Set slicer height
+
 # Object construction window
 STR_OBJECT_BUILD_CAPTION                                        :{WHITE}Object Selection
 STR_OBJECT_BUILD_PREVIEW_TOOLTIP                                :{BLACK}Preview of the object

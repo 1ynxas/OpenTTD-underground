@@ -38,6 +38,8 @@
 #include "landscape_cmd.h"
 #include "terraform_cmd.h"
 #include "object_cmd.h"
+#include "core/string_consumer.hpp"
+#include "heightslicer.h"
 
 #include "widgets/terraform_widget.h"
 
@@ -179,51 +181,118 @@ struct TerraformToolbarWindow : Window {
 		show_object->SetDisplayedPlane(ObjectClass::GetUIClassCount() != 0 ? 0 : SZSP_NONE);
 	}
 
+	std::string GetWidgetString(WidgetID widget, StringID stringid) const override
+	{
+		switch (widget) {
+			case WID_TT_SLICER_HEIGHT_TEXT:
+				return GetString(STR_JUST_INT, (int64_t)_slice_height);
+
+			case WID_TT_SLICER_TOGGLE:
+				return GetString(_view_slice ? STR_LANDSCAPING_SLICER_ON : STR_LANDSCAPING_SLICER_OFF);
+
+			default:
+				return this->Window::GetWidgetString(widget, stringid);
+		}
+	}
+
+	void OnPaint() override
+	{
+		this->SetWidgetDisabledState(WID_TT_SLICER_HEIGHT_DOWN, _slice_height == 0);
+		this->SetWidgetDisabledState(WID_TT_SLICER_HEIGHT_UP, _slice_height >= MAX_TILE_HEIGHT);
+		this->SetWidgetLoweredState(WID_TT_SLICER_TOGGLE, _view_slice);
+		this->DrawWidgets();
+	}
+
 	void OnClick([[maybe_unused]] Point pt, WidgetID widget, [[maybe_unused]] int click_count) override
 	{
-		if (widget < WID_TT_BUTTONS_START) return;
+		if (widget >= WID_TT_BUTTONS_START && widget < WID_TT_BUTTONS_END) {
+			switch (widget) {
+				case WID_TT_LOWER_LAND: // Lower land button
+					HandlePlacePushButton(this, WID_TT_LOWER_LAND, ANIMCURSOR_LOWERLAND, HT_POINT | HT_DIAGONAL);
+					this->last_user_action = widget;
+					break;
+
+				case WID_TT_RAISE_LAND: // Raise land button
+					HandlePlacePushButton(this, WID_TT_RAISE_LAND, ANIMCURSOR_RAISELAND, HT_POINT | HT_DIAGONAL);
+					this->last_user_action = widget;
+					break;
+
+				case WID_TT_LEVEL_LAND: // Level land button
+					HandlePlacePushButton(this, WID_TT_LEVEL_LAND, SPR_CURSOR_LEVEL_LAND, HT_POINT | HT_DIAGONAL);
+					this->last_user_action = widget;
+					break;
+
+				case WID_TT_DEMOLISH: // Demolish aka dynamite button
+					HandlePlacePushButton(this, WID_TT_DEMOLISH, ANIMCURSOR_DEMOLISH, HT_RECT | HT_DIAGONAL);
+					this->last_user_action = widget;
+					break;
+
+				case WID_TT_BUY_LAND: // Buy land button
+					HandlePlacePushButton(this, WID_TT_BUY_LAND, SPR_CURSOR_BUY_LAND, HT_RECT | HT_DIAGONAL);
+					this->last_user_action = widget;
+					break;
+
+				case WID_TT_PLANT_TREES: // Plant trees button
+					ShowBuildTreesToolbar();
+					break;
+
+				case WID_TT_PLACE_SIGN: // Place sign button
+					HandlePlacePushButton(this, WID_TT_PLACE_SIGN, SPR_CURSOR_SIGN, HT_RECT);
+					this->last_user_action = widget;
+					break;
+
+				case WID_TT_PLACE_OBJECT: // Place object button
+					ShowBuildObjectPicker();
+					break;
+
+				default: NOT_REACHED();
+			}
+			return;
+		}
 
 		switch (widget) {
-			case WID_TT_LOWER_LAND: // Lower land button
-				HandlePlacePushButton(this, WID_TT_LOWER_LAND, ANIMCURSOR_LOWERLAND, HT_POINT | HT_DIAGONAL);
-				this->last_user_action = widget;
+			case WID_TT_SLICER_TOGGLE: // Toggle height slicer
+				SetSlicer(!_view_slice);
+				this->SetDirty();
 				break;
 
-			case WID_TT_RAISE_LAND: // Raise land button
-				HandlePlacePushButton(this, WID_TT_RAISE_LAND, ANIMCURSOR_RAISELAND, HT_POINT | HT_DIAGONAL);
-				this->last_user_action = widget;
-				break;
+			case WID_TT_SLICER_HEIGHT_DOWN:
+			case WID_TT_SLICER_HEIGHT_UP: { // Height slicer arrows
+				/* Don't allow too fast scrolling */
+				if (!this->flags.Test(WindowFlag::Timeout) || this->timeout_timer <= 1) {
+					this->HandleButtonClick(widget);
+					this->SetDirty();
 
-			case WID_TT_LEVEL_LAND: // Level land button
-				HandlePlacePushButton(this, WID_TT_LEVEL_LAND, SPR_CURSOR_LEVEL_LAND, HT_POINT | HT_DIAGONAL);
-				this->last_user_action = widget;
+					int delta = widget - WID_TT_SLICER_HEIGHT_TEXT;
+					_slice_height = Clamp<int>((int)_slice_height + delta, 0, (int)MAX_TILE_HEIGHT);
+					if (_view_slice) MarkWholeScreenDirty();
+				}
+				_left_button_clicked = false;
 				break;
+			}
 
-			case WID_TT_DEMOLISH: // Demolish aka dynamite button
-				HandlePlacePushButton(this, WID_TT_DEMOLISH, ANIMCURSOR_DEMOLISH, HT_RECT | HT_DIAGONAL);
-				this->last_user_action = widget;
+			case WID_TT_SLICER_HEIGHT_TEXT: // Height slicer text input
+				ShowQueryString(GetString(STR_JUST_INT, (int64_t)_slice_height),
+					STR_LANDSCAPING_SLICER_HEIGHT_QUERY, 4, this, CS_NUMERAL, {});
 				break;
-
-			case WID_TT_BUY_LAND: // Buy land button
-				HandlePlacePushButton(this, WID_TT_BUY_LAND, SPR_CURSOR_BUY_LAND, HT_RECT | HT_DIAGONAL);
-				this->last_user_action = widget;
-				break;
-
-			case WID_TT_PLANT_TREES: // Plant trees button
-				ShowBuildTreesToolbar();
-				break;
-
-			case WID_TT_PLACE_SIGN: // Place sign button
-				HandlePlacePushButton(this, WID_TT_PLACE_SIGN, SPR_CURSOR_SIGN, HT_RECT);
-				this->last_user_action = widget;
-				break;
-
-			case WID_TT_PLACE_OBJECT: // Place object button
-				ShowBuildObjectPicker();
-				break;
-
-			default: NOT_REACHED();
 		}
+	}
+
+	void OnQueryTextFinished(std::optional<std::string> str) override
+	{
+		if (!str.has_value()) return;
+
+		auto value = ParseInteger<int32_t>(*str, 10, true);
+		if (!value.has_value()) return;
+
+		_slice_height = Clamp<int>(*value, 0, (int)MAX_TILE_HEIGHT);
+		if (_view_slice) MarkWholeScreenDirty();
+		this->SetDirty();
+	}
+
+	void OnTimeout() override
+	{
+		this->RaiseWidgetsWhenLowered(WID_TT_SLICER_HEIGHT_DOWN, WID_TT_SLICER_HEIGHT_UP);
 	}
 
 	void OnPlaceObject([[maybe_unused]] Point pt, TileIndex tile) override
@@ -353,6 +422,19 @@ static constexpr std::initializer_list<NWidgetPart> _nested_terraform_widgets = 
 			NWidget(WWT_PUSHIMGBTN, Colours::DarkGreen, WID_TT_PLACE_OBJECT), SetToolbarMinimalSize(1),
 								SetFill(0, 1), SetSpriteTip(SPR_IMG_TRANSMITTER, STR_SCENEDIT_TOOLBAR_PLACE_OBJECT_TOOLTIP),
 		EndContainer(),
+
+		NWidget(WWT_PANEL, Colours::DarkGreen), SetToolbarSpacerMinimalSize(), EndContainer(),
+
+		NWidget(WWT_TEXTBTN, Colours::DarkGreen, WID_TT_SLICER_TOGGLE), SetMinimalSize(40, 22),
+								SetFill(0, 1), SetStringTip(STR_LANDSCAPING_SLICER_TOGGLE, STR_LANDSCAPING_SLICER_TOGGLE_TOOLTIP),
+		NWidget(WWT_IMGBTN, Colours::DarkGreen, WID_TT_SLICER_HEIGHT_DOWN),
+								SetFill(0, 1), SetSpriteTip(SPR_ARROW_DOWN, STR_LANDSCAPING_SLICER_HEIGHT_DOWN_TOOLTIP),
+								SetAspect(WidgetDimensions::ASPECT_UP_DOWN_BUTTON),
+		NWidget(WWT_PUSHTXTBTN, Colours::DarkGreen, WID_TT_SLICER_HEIGHT_TEXT), SetMinimalSize(30, 22),
+								SetFill(0, 1), SetToolTip(STR_LANDSCAPING_SLICER_HEIGHT_TOOLTIP),
+		NWidget(WWT_IMGBTN, Colours::DarkGreen, WID_TT_SLICER_HEIGHT_UP),
+								SetFill(0, 1), SetSpriteTip(SPR_ARROW_UP, STR_LANDSCAPING_SLICER_HEIGHT_UP_TOOLTIP),
+								SetAspect(WidgetDimensions::ASPECT_UP_DOWN_BUTTON),
 	EndContainer(),
 };
 
